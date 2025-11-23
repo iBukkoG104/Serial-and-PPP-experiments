@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SerialTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+09abf6bef96e481a3952372d3ec9e617d902635d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+254fdd8ae4b14f2f1a06321c4fd16c983e1b9d69")]
 [assembly: System.Reflection.AssemblyProductAttribute("SerialTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SerialTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
