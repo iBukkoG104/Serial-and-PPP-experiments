@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/run/media/matteo/DATI II/Serial-and-PPP-experiments/SerialTest/SerialTest.csproj": {}
+    "/home/matteo/Desktop/Serial-and-PPP-experiments/Serial_Test/SerialTest_CS/SerialTest.csproj": {}
   },
   "projects": {
-    "/run/media/matteo/DATI II/Serial-and-PPP-experiments/SerialTest/SerialTest.csproj": {
+    "/home/matteo/Desktop/Serial-and-PPP-experiments/Serial_Test/SerialTest_CS/SerialTest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/run/media/matteo/DATI II/Serial-and-PPP-experiments/SerialTest/SerialTest.csproj",
+        "projectUniqueName": "/home/matteo/Desktop/Serial-and-PPP-experiments/Serial_Test/SerialTest_CS/SerialTest.csproj",
         "projectName": "SerialTest",
-        "projectPath": "/run/media/matteo/DATI II/Serial-and-PPP-experiments/SerialTest/SerialTest.csproj",
+        "projectPath": "/home/matteo/Desktop/Serial-and-PPP-experiments/Serial_Test/SerialTest_CS/SerialTest.csproj",
         "packagesPath": "/home/matteo/.nuget/packages/",
-        "outputPath": "/run/media/matteo/DATI II/Serial-and-PPP-experiments/SerialTest/obj/",
+        "outputPath": "/home/matteo/Desktop/Serial-and-PPP-experiments/Serial_Test/SerialTest_CS/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/matteo/.nuget/NuGet/NuGet.Config"

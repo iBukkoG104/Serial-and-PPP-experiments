@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+/cc7DdfN+g=",
+  "dgSpecHash": "N0b6DMZ33uY=",
   "success": true,
-  "projectFilePath": "/run/media/matteo/DATI II/Serial-and-PPP-experiments/SerialTest/SerialTest.csproj",
+  "projectFilePath": "/home/matteo/Desktop/Serial-and-PPP-experiments/Serial_Test/SerialTest_CS/SerialTest.csproj",
   "expectedPackageFiles": [
     "/home/matteo/.nuget/packages/runtime.android-arm.runtime.native.system.io.ports/10.0.0/runtime.android-arm.runtime.native.system.io.ports.10.0.0.nupkg.sha512",
     "/home/matteo/.nuget/packages/runtime.android-arm64.runtime.native.system.io.ports/10.0.0/runtime.android-arm64.runtime.native.system.io.ports.10.0.0.nupkg.sha512",

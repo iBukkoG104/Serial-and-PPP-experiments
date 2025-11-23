@@ -1,5 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Ports;
 using System.Collections.Generic;
@@ -11,10 +10,11 @@ using System.Net;
 static class Program {
     static void Main(string[] args) {
 
+        const string SERIAL_PORT = "/dev/ttyACM0";
 		const int BAUDRATE = 115200;
 
         WebClient wc = new WebClient();
-        SerialPort Serial = new SerialPort("/dev/ttyACM0", BAUDRATE);
+        SerialPort Serial = new SerialPort(SERIAL_PORT, BAUDRATE);
         string text = "";
 
         if (!Serial.IsOpen) {
@@ -50,6 +50,7 @@ static class Program {
                 string result = wc.DownloadString(url);
 
                 Serial.Write('\n'.ToString()); Serial.Write(result);
+                Console.WriteLine(result);
             }
             
        } Serial.Close();     
