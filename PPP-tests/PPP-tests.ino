@@ -3,12 +3,15 @@
 #include <lwIP_Arduino.h>
 #include <lwip/include/netif/ppp/pppapi.h>
 #include <lwip/include/netif/ppp/pppos.h>
+#include <lwip/include/tcp.h>
+#include <lwip/include/timers.h>
+#include <lwip/include/dns.h>
 
 #include "lwip/sio.h"
 
 /*--------Driver SIO------*/
 // Riferimento alla seriale che userai per il PPP
-#define PPP_SERIAL Serial
+#define PPP_SERIAL Serial1
 
 // Implementazione richiesta da lwIP per aprire la seriale
 sio_fd_t sio_open(u8_t devnum) {
