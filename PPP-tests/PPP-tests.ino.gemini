@@ -1,0 +1,146 @@
+#include <Arduino.h>
+#include "lwipopts.h"
+#include <lwIP_Arduino.h>
+#include <lwip/include/netif/ppp/pppapi.h>
+#include <lwip/include/netif/ppp/pppos.h>
+#include <lwip/include/lwip/tcp.h>
+//#include <lwip/include/lwip/timers.h>
+#include <lwip/include/lwip/dns.h>
+
+#include "lwip/include/lwip/sio.h"
+
+/*--------Driver SIO------*/
+// Riferimento alla seriale che userai per il PPP
+#define PPP_SERIAL Serial1
+
+// Implementazione richiesta da lwIP per aprire la seriale
+sio_fd_t sio_open(u8_t devnum) {
+    // In Arduino la seriale si apre nel setup(), qui ritorniamo solo un identificativo fittizio
+    // devnum potrebbe essere usato per scegliere tra Serial1, Serial2, ecc.
+    return (sio_fd_t)devnum; 
+}
+
+// Implementazione richiesta da lwIP per inviare dati
+u32_t sio_write(sio_fd_t fd, u8_t *data, u32_t len) {
+    // Scriviamo i dati sulla seriale hardware di Arduino
+    size_t written = PPP_SERIAL.write(data, len);
+    return (u32_t)written;
+}
+
+// Implementazione lettura (spesso opzionale se gestiamo l'input nel loop, ma lwIP potrebbe chiederla)
+u32_t sio_read(sio_fd_t fd, u8_t *data, u32_t len) {
+    u32_t count = 0;
+    while (count < len && PPP_SERIAL.available()) {
+        data[count] = PPP_SERIAL.read();
+        count++;
+    }
+    return count;
+}
+
+// Funzione dummy per la chiusura
+void sio_read_abort(sio_fd_t fd) {}
+
+ppp_pcb *ppp;       // Control Block del PPP
+struct netif ppp_netif; // Interfaccia di rete
+
+// --- Callback per lo stato del PPP ---
+void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
+    if (err_code == PPPERR_NONE) {
+        Serial.println("PPP Connesso! IP assegnato.");
+        Serial.print("IP Address: ");
+        Serial.println(ip4addr_ntoa(netif_ip4_addr(&ppp_netif)));
+        
+        // QUI puoi lanciare la tua richiesta HTTP
+        // make_http_request(); 
+    } else {
+        Serial.print("Errore PPP: ");
+        Serial.println(err_code);
+    }
+}
+
+// --- Callback HTTP (Raw API) ---
+err_t http_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err) {
+    if (p == NULL) {
+        // Connessione chiusa dal server
+        tcp_close(tpcb);
+        Serial.println("Connessione chiusa dal server.");
+        return ERR_OK;
+    }
+
+    // Ho ricevuto dati! (HTML)
+    // Qui dovresti parsare l'HTML e inviarlo all'LCD
+    char *data = (char *)p->payload;
+    Serial.print("Ricevuto: ");
+    Serial.write(data, p->len); 
+
+    // Importante: dire a lwIP che abbiamo processato i dati
+    tcp_recved(tpcb, p->len);
+    pbuf_free(p);
+    return ERR_OK;
+}
+
+void http_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err) {
+    if (err == ERR_OK) {
+        Serial.println("TCP Connesso al Web Server. Invio GET...");
+        const char *http_get = "GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n";
+        tcp_write(tpcb, http_get, strlen(http_get), TCP_WRITE_FLAG_COPY);
+        tcp_output(tpcb); // Forza l'invio
+    }
+}
+
+// Funzione per avviare la richiesta
+void make_http_request() {
+    struct tcp_pcb *pcb = tcp_new();
+    tcp_recv(pcb, http_recv_callback);
+    
+    ip_addr_t remote_ip;
+    // Nota: In un caso reale dovresti usare il DNS resolver di lwIP prima
+    // Per test, usa l'IP diretto del server o del PC gateway
+    IP4_ADDR(&remote_ip, 192, 168, 1, 100); // Esempio IP del server
+
+    tcp_connect(pcb, &remote_ip, 80, http_connected_callback);
+}
+
+
+// --- SETUP ---
+void setup() {
+    Serial.begin(115200); // Debug console
+    Serial1.begin(115200); // PPP link verso il PC (deve corrispondere alla velocità del PC)
+    
+    Serial.println("Inizializzazione lwIP...");
+    
+    // 1. Inizializza lo stack
+    lwip_init();
+
+    // 2. Crea l'istanza PPP
+    ppp = pppos_create(&ppp_netif, sio_open(1), ppp_status_cb, NULL);
+    
+    if (!ppp) {
+        Serial.println("Errore creazione PPP");
+        while(1);
+    }
+
+    // 3. Configura autenticazione (se il PC la richiede)
+    // ppp_set_auth(ppp, PPPAUTHTYPE_PAP, "username", "password");
+
+    // 4. Imposta questa interfaccia come default
+    ppp_set_default(ppp);
+
+    // 5. Connetti
+    Serial.println("Tentativo di connessione PPP...");
+    ppp_connect(ppp, 0);
+}
+
+// --- LOOP ---
+void loop() {
+    // CRUCIALE: Leggere dalla seriale e passare a lwIP byte per byte
+    // Questo "nutre" lo stack lwIP con i dati in arrivo dal PC
+    while (Serial1.available()) {
+        u8_t c = Serial1.read();
+        pppos_input(ppp, &c, 1);
+    }
+
+    // Gestione dei timer di lwIP (timeout TCP, ritrasmissioni, ecc)
+    // Poiché siamo NO_SYS, dobbiamo chiamare sys_check_timeouts periodocamente
+    sys_check_timeouts();
+}
